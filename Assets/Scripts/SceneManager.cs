@@ -130,11 +130,12 @@ public class SceneManager : MonoBehaviour
 
     public void InitPlayField()
     {
+        isRunning = false;
         GameEndingText.text = "";
         currentDirection = Directions.Up;
-        currentRow = 0;
-        currentCol = 0;
-        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(20f, 20f);
+        currentRow = 1;
+        currentCol = 1;
+        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(60f, 60f);
         Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
 
         ClearInstructions();
@@ -142,15 +143,15 @@ public class SceneManager : MonoBehaviour
         for (int r = 0; r < rows; r++)
         {
             int flagIndex = -1;
-            if (r == (rows - 1))
+            if (r == (rows - 2))
             {
-                flagIndex = Random.Range(0, cols);
+                flagIndex = Random.Range(1, cols - 1);
             }
             for (int c = 0; c < cols; c++)
             {
                 int randVal = Random.Range(0, 100);
                 bool isFlag = flagIndex == c;
-                bool isRock = !isFlag && randVal < 15 && r > 0;
+                bool isRock = (r == 0 || r == rows - 1 || c == 0 || c == cols -1) || (!isFlag && randVal < 15 && r != 1);
                 tiles[r * cols + c] = Instantiate(TilePrefab, new Vector3(0, 0, 0), Quaternion.identity, TileContainer.transform);
                 tiles[r * cols + c].GetComponent<RectTransform>().anchoredPosition = new Vector2(c * delta, r * delta);
                 tiles[r * cols + c].GetComponent<Tile>().Init(isFlag, isRock);
@@ -166,26 +167,38 @@ public class SceneManager : MonoBehaviour
 
     public void SelectRotateRight()
     {
+        if (isRunning)
+            return;
         instructions.Add("R");
         UpdateInstruction();
     }
+
     public void SelectRotateLeft()
     {
+        if (isRunning)
+            return;
         instructions.Add("L");
         UpdateInstruction();
     }
+
     public void SelectForward()
     {
+        if (isRunning)
+            return;
         instructions.Add("F");
         UpdateInstruction();
     }
+
     public void SelectDelete()
     {
+        if (isRunning)
+            return;
         if (instructions.Count == 0)
             return;
         instructions.RemoveAt(instructions.Count - 1);
         UpdateInstruction();
     }
+
     void UpdateInstruction()
     {
         string instr = "";
@@ -198,6 +211,8 @@ public class SceneManager : MonoBehaviour
 
     public void StartRover()
     {
+        if (isRunning)
+            return;
         currentInstruction = 0;
         isRunning = true;
         runTimer = runTimerMax;
