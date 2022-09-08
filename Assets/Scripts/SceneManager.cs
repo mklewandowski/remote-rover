@@ -21,6 +21,8 @@ public class SceneManager : MonoBehaviour
     GameObject Rover;
     [SerializeField]
     TextMeshProUGUI InstructionsText;
+    [SerializeField]
+    TextMeshProUGUI GameEndingText;
 
     int rows = 10;
     int cols = 10;
@@ -53,12 +55,10 @@ public class SceneManager : MonoBehaviour
                     if (currentInstruction >= instructions.Count)
                     {
                         isRunning = false;
-
                     }
                     else
                     {
                         string instr = instructions[currentInstruction];
-                        Debug.Log(instr);
                         if (instr == "F")
                         {
                             if (currentDirection == Directions.Up)
@@ -92,7 +92,6 @@ public class SceneManager : MonoBehaviour
                             else if (currentDirection == Directions.Right)
                                 currentDirection = Directions.Up;
                         }
-                        Debug.Log(currentCol + "," + currentRow);
                         float delta = 40f;
                         Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(20f + currentCol * delta, 20f + currentRow * delta);
                         float zRot = 0;
@@ -104,6 +103,11 @@ public class SceneManager : MonoBehaviour
                             zRot = 90f;
                         Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, zRot);
 
+                        if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsFlag())
+                            Win();
+                        else if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsRock())
+                            Lose();
+
                         currentInstruction++;
                         runTimer = runTimerMax;
                     }
@@ -112,8 +116,21 @@ public class SceneManager : MonoBehaviour
         }
     }
 
+    void Win()
+    {
+        GameEndingText.text = "YOU FOUND THE FLAG!";
+        isRunning = false;
+    }
+
+    void Lose()
+    {
+        GameEndingText.text = "YOU HIT A BOULDER!";
+        isRunning = false;
+    }
+
     public void InitPlayField()
     {
+        GameEndingText.text = "";
         currentDirection = Directions.Up;
         currentRow = 0;
         currentCol = 0;

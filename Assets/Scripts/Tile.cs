@@ -22,10 +22,12 @@ public class Tile : MonoBehaviour
     {
         if (_isFlag)
         {
+            isFlag = true;
             TileImage.sprite = FlagSprite;
         }
         else if (_isRock)
         {
+            isRock = true;
             TileImage.sprite = RockSprite;
         }
         else
