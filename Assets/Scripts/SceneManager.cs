@@ -5,11 +5,20 @@ using TMPro;
 
 public class SceneManager : MonoBehaviour
 {
+    enum Directions {
+        Up,
+        Down,
+        Left,
+        Right
+    }
+    Directions currentDirection = Directions.Up;
 
     [SerializeField]
     GameObject TileContainer;
     [SerializeField]
     GameObject TilePrefab;
+    [SerializeField]
+    GameObject Rover;
     [SerializeField]
     TextMeshProUGUI InstructionsText;
 
@@ -20,14 +29,97 @@ public class SceneManager : MonoBehaviour
 
     List<string> instructions = new List<string>();
 
+    int currentInstruction = 0;
+    int currentRow = 0;
+    int currentCol = 0;
+    bool isRunning = false;
+    float runTimer = 0;
+    float runTimerMax = .25f;
+
     // Start is called before the first frame update
     void Start()
     {
         InitPlayField();
     }
+    void Update()
+    {
+        if (isRunning)
+        {
+            if (runTimer > 0)
+            {
+                runTimer -= Time.deltaTime;
+                if (runTimer <= 0)
+                {
+                    if (currentInstruction >= instructions.Count)
+                    {
+                        isRunning = false;
+
+                    }
+                    else
+                    {
+                        string instr = instructions[currentInstruction];
+                        Debug.Log(instr);
+                        if (instr == "F")
+                        {
+                            if (currentDirection == Directions.Up)
+                                currentRow++;
+                            else if (currentDirection == Directions.Right)
+                                currentCol++;
+                            else if (currentDirection == Directions.Down)
+                                currentRow--;
+                            else if (currentDirection == Directions.Left)
+                                currentCol--;
+                        }
+                        else if (instr == "R")
+                        {
+                            if (currentDirection == Directions.Up)
+                                currentDirection = Directions.Right;
+                            else if (currentDirection == Directions.Right)
+                                currentDirection = Directions.Down;
+                            else if (currentDirection == Directions.Down)
+                                currentDirection = Directions.Left;
+                            else if (currentDirection == Directions.Left)
+                                currentDirection = Directions.Up;
+                        }
+                        else if (instr == "L")
+                        {
+                            if (currentDirection == Directions.Up)
+                                currentDirection = Directions.Left;
+                            else if (currentDirection == Directions.Left)
+                                currentDirection = Directions.Down;
+                            else if (currentDirection == Directions.Down)
+                                currentDirection = Directions.Right;
+                            else if (currentDirection == Directions.Right)
+                                currentDirection = Directions.Up;
+                        }
+                        Debug.Log(currentCol + "," + currentRow);
+                        float delta = 40f;
+                        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(20f + currentCol * delta, 20f + currentRow * delta);
+                        float zRot = 0;
+                        if (currentDirection == Directions.Right)
+                            zRot = 270f;
+                        else if (currentDirection == Directions.Down)
+                            zRot = 180f;
+                        else if (currentDirection == Directions.Left)
+                            zRot = 90f;
+                        Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, zRot);
+
+                        currentInstruction++;
+                        runTimer = runTimerMax;
+                    }
+                }
+            }
+        }
+    }
 
     public void InitPlayField()
     {
+        currentDirection = Directions.Up;
+        currentRow = 0;
+        currentCol = 0;
+        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(20f, 20f);
+        Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
+
         ClearInstructions();
         float delta = 40f;
         for (int r = 0; r < rows; r++)
@@ -85,5 +177,12 @@ public class SceneManager : MonoBehaviour
             instr = instr + instructions[i];
         }
         InstructionsText.text = instr;
+    }
+
+    public void StartRover()
+    {
+        currentInstruction = 0;
+        isRunning = true;
+        runTimer = runTimerMax;
     }
 }
