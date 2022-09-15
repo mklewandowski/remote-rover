@@ -92,8 +92,8 @@ public class SceneManager : MonoBehaviour
                             else if (currentDirection == Directions.Right)
                                 currentDirection = Directions.Up;
                         }
-                        float delta = 40f;
-                        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(20f + currentCol * delta, 20f + currentRow * delta);
+                        float delta = 60f;
+                        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(30f + currentCol * delta, 30f + currentRow * delta);
                         float zRot = 0;
                         if (currentDirection == Directions.Right)
                             zRot = 270f;
@@ -135,27 +135,39 @@ public class SceneManager : MonoBehaviour
         currentDirection = Directions.Up;
         currentRow = 1;
         currentCol = 1;
-        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(60f, 60f);
+        Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(90f, 90f);
         Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
 
         ClearInstructions();
-        float delta = 40f;
+        ClearTiles();
+
+        float delta = 60f;
+        int pStartCol = 1;
         for (int r = 0; r < rows; r++)
         {
+            int pEndCol = r > 0 ? Random.Range(1, 9) : 1;
+            int pMinCol = pStartCol < pEndCol ? pStartCol : pEndCol;
+            int pMaxCol = pStartCol > pEndCol ? pStartCol : pEndCol;
             int flagIndex = -1;
             if (r == (rows - 2))
             {
                 flagIndex = Random.Range(1, cols - 1);
+                if (flagIndex < pMinCol)
+                    pMinCol = flagIndex;
+                else if (flagIndex > pMaxCol)
+                    pMaxCol = flagIndex;
             }
+
             for (int c = 0; c < cols; c++)
             {
                 int randVal = Random.Range(0, 100);
                 bool isFlag = flagIndex == c;
-                bool isRock = (r == 0 || r == rows - 1 || c == 0 || c == cols -1) || (!isFlag && randVal < 15 && r != 1);
+                bool isRock = (r == 0 || r == rows - 1 || c == 0 || c == cols -1) || (!isFlag && (c < pMinCol || c > pMaxCol));
                 tiles[r * cols + c] = Instantiate(TilePrefab, new Vector3(0, 0, 0), Quaternion.identity, TileContainer.transform);
                 tiles[r * cols + c].GetComponent<RectTransform>().anchoredPosition = new Vector2(c * delta, r * delta);
                 tiles[r * cols + c].GetComponent<Tile>().Init(isFlag, isRock);
             }
+            pStartCol = pEndCol;
         }
     }
 
@@ -163,6 +175,14 @@ public class SceneManager : MonoBehaviour
     {
         instructions.Clear();
         InstructionsText.text = "";
+    }
+
+    void ClearTiles()
+    {
+        for (int t = 0; t < tiles.Length; t++)
+        {
+            Destroy(tiles[t]);
+        }
     }
 
     public void SelectRotateRight()
