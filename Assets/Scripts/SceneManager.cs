@@ -129,12 +129,12 @@ public class SceneManager : MonoBehaviour
                         float zRot = 0;
                         float yRot = 0;
                         float xEndAdjust = 0f;
-                        float zEndAdjust = -70f;
+                        float zEndAdjust = -7f;
                         if (currentDirection == Directions.Right)
                         {
                             zRot = 270f;
                             yRot = 90f;
-                            xEndAdjust = -70f;
+                            xEndAdjust = -7f;
                             zEndAdjust = 0;
                         }
                         else if (currentDirection == Directions.Down)
@@ -142,13 +142,13 @@ public class SceneManager : MonoBehaviour
                             zRot = 180f;
                             yRot = 180f;
                             xEndAdjust = 0;
-                            zEndAdjust = 70f;
+                            zEndAdjust = 7f;
                         }
                         else if (currentDirection == Directions.Left)
                         {
                             zRot = 90f;
                             yRot = 270f;
-                            xEndAdjust = 70f;
+                            xEndAdjust = 7f;
                             zEndAdjust = 0;
                         }
                         Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, zRot);
@@ -168,7 +168,7 @@ public class SceneManager : MonoBehaviour
                         }
 
                         // set first person position and orientation
-                        desiredPos = new Vector3(currentCol * 100f + xEndAdjust, 30f, currentRow * 100f + zEndAdjust);
+                        desiredPos = new Vector3(currentCol * 10f + xEndAdjust, 3f, currentRow * 10f + zEndAdjust);
                         desiredRot = new Vector3(0, yRot, 0);
                         currentPos = MainCamera.transform.localPosition;
                         currentRot = MainCamera.transform.localEulerAngles;
@@ -215,10 +215,10 @@ public class SceneManager : MonoBehaviour
         ClearTiles();
 
         // reset first person
-        MainCamera.transform.localPosition = new Vector3(100f, 30f, 100f);
+        MainCamera.transform.localPosition = new Vector3(10f, 3f, 10f);
         MainCamera.transform.localEulerAngles = new Vector3(0, 0, 0);
-        currentPos = new Vector3(100f, 30f, 100f);
-        desiredPos = new Vector3(100f, 30f, 100f);
+        currentPos = new Vector3(10f, 3f, 10f);
+        desiredPos = new Vector3(10f, 3f, 10f);
         currentRot = new Vector3(0, 0, 0);
         desiredRot = new Vector3(0, 0, 0);
 
@@ -253,12 +253,12 @@ public class SceneManager : MonoBehaviour
 
                 if (isRock)
                 {
-                    GameObject GO = Instantiate(RockPrefab, new Vector3(c * 100f, 5f, r * 100f), Quaternion.identity, FirstPersonPlayfield.transform);
+                    GameObject GO = Instantiate(RockPrefab, new Vector3(c * 10f, .4f, r * 10f), Quaternion.identity, FirstPersonPlayfield.transform);
                     firstPersonTiles[r * cols + c] = GO;
                 }
                 else if (isFlag)
                 {
-                    GameObject GO = Instantiate(GoalPrefab, new Vector3(c * 100f, 5f, r * 100f), Quaternion.identity, FirstPersonPlayfield.transform);
+                    GameObject GO = Instantiate(GoalPrefab, new Vector3(c * 10f, .4f, r * 10f), Quaternion.identity, FirstPersonPlayfield.transform);
                     firstPersonTiles[r * cols + c] = GO;
                 }
             }
