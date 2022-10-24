@@ -86,7 +86,7 @@ public class SceneManager : MonoBehaviour
                     }
                     else if (currentInstruction >= instructions.Count)
                     {
-                        isRunning = false;
+                        Stuck();
                     }
                     else
                     {
@@ -190,6 +190,12 @@ public class SceneManager : MonoBehaviour
     void Lose()
     {
         GameEndingText.text = "YOU HIT A BOULDER!";
+        isRunning = false;
+    }
+
+    void Stuck()
+    {
+        GameEndingText.text = "NO MORE INSTRUCTIONS!";
         isRunning = false;
     }
 
