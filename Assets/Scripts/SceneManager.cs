@@ -14,6 +14,8 @@ public class SceneManager : MonoBehaviour
     Directions currentDirection = Directions.Up;
 
     [SerializeField]
+    GameObject ProgramPanel;
+    [SerializeField]
     GameObject TileContainer;
     [SerializeField]
     GameObject TilePrefab;
@@ -47,6 +49,8 @@ public class SceneManager : MonoBehaviour
     bool isRunning = false;
     float runTimer = 0;
     float runTimerMax = .25f;
+
+    bool showFirstPerson = false;
 
     // Start is called before the first frame update
     void Start()
@@ -106,31 +110,48 @@ public class SceneManager : MonoBehaviour
                         Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(30f + currentCol * delta, 30f + currentRow * delta);
                         float zRot = 0;
                         float yRot = 0;
+                        float xEndAdjust = 0f;
+                        float zEndAdjust = -70f;
                         if (currentDirection == Directions.Right)
                         {
                             zRot = 270f;
                             yRot = 90f;
+                            xEndAdjust = -70f;
+                            zEndAdjust = 0;
                         }
                         else if (currentDirection == Directions.Down)
                         {
                             zRot = 180f;
                             yRot = 180f;
+                            xEndAdjust = 0;
+                            zEndAdjust = 70f;
                         }
                         else if (currentDirection == Directions.Left)
                         {
                             zRot = 90f;
                             yRot = 270f;
+                            xEndAdjust = 70f;
+                            zEndAdjust = 0;
                         }
                         Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, zRot);
 
+                        if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsFlag())
+                        {
+                            Win();
+                        }
+                        else if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsRock())
+                        {
+                            Lose();
+                        }
+                        else
+                        {
+                            xEndAdjust = 0;
+                            zEndAdjust = 0;
+                        }
+
                         // move first person
                         MainCamera.transform.localEulerAngles = new Vector3(0, yRot, 0);
-                        MainCamera.transform.localPosition = new Vector3(currentCol * 100f, MainCamera.transform.localPosition.y, currentRow * 100f);
-
-                        if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsFlag())
-                            Win();
-                        else if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsRock())
-                            Lose();
+                        MainCamera.transform.localPosition = new Vector3(currentCol * 100f + xEndAdjust, MainCamera.transform.localPosition.y, currentRow * 100f + zEndAdjust);
 
                         currentInstruction++;
                         runTimer = runTimerMax;
@@ -142,7 +163,7 @@ public class SceneManager : MonoBehaviour
 
     void Win()
     {
-        GameEndingText.text = "YOU FOUND THE FLAG!";
+        GameEndingText.text = "YOU REACHED THE GOAL!";
         isRunning = false;
     }
 
@@ -150,6 +171,12 @@ public class SceneManager : MonoBehaviour
     {
         GameEndingText.text = "YOU HIT A BOULDER!";
         isRunning = false;
+    }
+
+    void ToggleDisplay()
+    {
+        ProgramPanel.SetActive(!showFirstPerson);
+        FirstPersonPlayfield.SetActive(showFirstPerson);
     }
 
     public void InitPlayField()
@@ -167,6 +194,9 @@ public class SceneManager : MonoBehaviour
 
         // reset first person
         MainCamera.transform.localPosition = new Vector3(100f, MainCamera.transform.localPosition.y, 100f);
+
+        showFirstPerson = false;
+        ToggleDisplay();
 
         float delta = 60f;
         int pStartCol = 1;
@@ -278,5 +308,13 @@ public class SceneManager : MonoBehaviour
         currentInstruction = 0;
         isRunning = true;
         runTimer = runTimerMax;
+        showFirstPerson = true;
+        ToggleDisplay();
+    }
+
+    public void ToggleView()
+    {
+        showFirstPerson = !showFirstPerson;
+        ToggleDisplay();
     }
 }
