@@ -29,6 +29,16 @@ public class SceneManager : MonoBehaviour
 
     GameObject [] tiles = new GameObject[100];
 
+    [SerializeField]
+    GameObject FirstPersonPlayfield;
+    [SerializeField]
+    GameObject MainCamera;
+    [SerializeField]
+    GameObject RockPrefab;
+    [SerializeField]
+    GameObject GoalPrefab;
+    GameObject [] firstPersonTiles = new GameObject[100];
+
     List<string> instructions = new List<string>();
 
     int currentInstruction = 0;
@@ -95,13 +105,27 @@ public class SceneManager : MonoBehaviour
                         float delta = 60f;
                         Rover.GetComponent<RectTransform>().anchoredPosition = new Vector2(30f + currentCol * delta, 30f + currentRow * delta);
                         float zRot = 0;
+                        float yRot = 0;
                         if (currentDirection == Directions.Right)
+                        {
                             zRot = 270f;
+                            yRot = 90f;
+                        }
                         else if (currentDirection == Directions.Down)
+                        {
                             zRot = 180f;
+                            yRot = 180f;
+                        }
                         else if (currentDirection == Directions.Left)
+                        {
                             zRot = 90f;
+                            yRot = 270f;
+                        }
                         Rover.GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, zRot);
+
+                        // move first person
+                        MainCamera.transform.localEulerAngles = new Vector3(0, yRot, 0);
+                        MainCamera.transform.localPosition = new Vector3(currentCol * 100f, MainCamera.transform.localPosition.y, currentRow * 100f);
 
                         if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsFlag())
                             Win();
@@ -141,6 +165,9 @@ public class SceneManager : MonoBehaviour
         ClearInstructions();
         ClearTiles();
 
+        // reset first person
+        MainCamera.transform.localPosition = new Vector3(100f, MainCamera.transform.localPosition.y, 100f);
+
         float delta = 60f;
         int pStartCol = 1;
         for (int r = 0; r < rows; r++)
@@ -166,6 +193,17 @@ public class SceneManager : MonoBehaviour
                 tiles[r * cols + c] = Instantiate(TilePrefab, new Vector3(0, 0, 0), Quaternion.identity, TileContainer.transform);
                 tiles[r * cols + c].GetComponent<RectTransform>().anchoredPosition = new Vector2(c * delta, r * delta);
                 tiles[r * cols + c].GetComponent<Tile>().Init(isFlag, isRock);
+
+                if (isRock)
+                {
+                    GameObject GO = Instantiate(RockPrefab, new Vector3(c * 100f, 5f, r * 100f), Quaternion.identity, FirstPersonPlayfield.transform);
+                    firstPersonTiles[r * cols + c] = GO;
+                }
+                else if (isFlag)
+                {
+                    GameObject GO = Instantiate(GoalPrefab, new Vector3(c * 100f, 5f, r * 100f), Quaternion.identity, FirstPersonPlayfield.transform);
+                    firstPersonTiles[r * cols + c] = GO;
+                }
             }
             pStartCol = pEndCol;
         }
@@ -182,6 +220,10 @@ public class SceneManager : MonoBehaviour
         for (int t = 0; t < tiles.Length; t++)
         {
             Destroy(tiles[t]);
+        }
+        for (int t = 0; t < firstPersonTiles.Length; t++)
+        {
+            Destroy(firstPersonTiles[t]);
         }
     }
 
