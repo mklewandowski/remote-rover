@@ -36,7 +36,7 @@ public class SceneManager : MonoBehaviour
     [SerializeField]
     GameObject MainCamera;
     [SerializeField]
-    GameObject RockPrefab;
+    GameObject [] RockPrefab = new GameObject[4];
     [SerializeField]
     GameObject GoalPrefab;
     GameObject [] firstPersonTiles = new GameObject[100];
@@ -253,7 +253,9 @@ public class SceneManager : MonoBehaviour
 
                 if (isRock)
                 {
-                    GameObject GO = Instantiate(RockPrefab, new Vector3(c * 10f, .4f, r * 10f), Quaternion.identity, FirstPersonPlayfield.transform);
+                    int rockRandVal = Random.Range(0, RockPrefab.Length);
+                    GameObject GO = Instantiate(RockPrefab[rockRandVal], new Vector3(c * 10f, .4f, r * 10f), Quaternion.identity, FirstPersonPlayfield.transform);
+                    GO.transform.localEulerAngles = new Vector3(0, Random.Range(0f, 100f), 0f);
                     firstPersonTiles[r * cols + c] = GO;
                 }
                 else if (isFlag)
