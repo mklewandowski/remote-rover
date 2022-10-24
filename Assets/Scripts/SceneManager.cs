@@ -40,6 +40,10 @@ public class SceneManager : MonoBehaviour
     [SerializeField]
     GameObject GoalPrefab;
     GameObject [] firstPersonTiles = new GameObject[100];
+    Vector3 currentPos;
+    Vector3 desiredPos;
+    Vector3 currentRot;
+    Vector3 desiredRot;
 
     List<string> instructions = new List<string>();
 
@@ -48,7 +52,9 @@ public class SceneManager : MonoBehaviour
     int currentCol = 0;
     bool isRunning = false;
     float runTimer = 0;
-    float runTimerMax = .25f;
+    float runTimerMax = .5f;
+    bool hitRock = false;
+    bool foundGoal = false;
 
     bool showFirstPerson = false;
 
@@ -64,9 +70,21 @@ public class SceneManager : MonoBehaviour
             if (runTimer > 0)
             {
                 runTimer -= Time.deltaTime;
+
+                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, 1f - runTimer * 2f);
+                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, 1f - runTimer * 2f);
+
                 if (runTimer <= 0)
                 {
-                    if (currentInstruction >= instructions.Count)
+                    if (hitRock)
+                    {
+                        Lose();
+                    }
+                    if (foundGoal)
+                    {
+                        Win();
+                    }
+                    else if (currentInstruction >= instructions.Count)
                     {
                         isRunning = false;
                     }
@@ -137,11 +155,11 @@ public class SceneManager : MonoBehaviour
 
                         if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsFlag())
                         {
-                            Win();
+                            foundGoal = true;
                         }
                         else if (tiles[currentCol + currentRow * cols].GetComponent<Tile>().IsRock())
                         {
-                            Lose();
+                            hitRock = true;
                         }
                         else
                         {
@@ -149,9 +167,11 @@ public class SceneManager : MonoBehaviour
                             zEndAdjust = 0;
                         }
 
-                        // move first person
-                        MainCamera.transform.localEulerAngles = new Vector3(0, yRot, 0);
-                        MainCamera.transform.localPosition = new Vector3(currentCol * 100f + xEndAdjust, MainCamera.transform.localPosition.y, currentRow * 100f + zEndAdjust);
+                        // set first person position and orientation
+                        desiredPos = new Vector3(currentCol * 100f + xEndAdjust, 30f, currentRow * 100f + zEndAdjust);
+                        desiredRot = new Vector3(0, yRot, 0);
+                        currentPos = MainCamera.transform.localPosition;
+                        currentRot = MainCamera.transform.localEulerAngles;
 
                         currentInstruction++;
                         runTimer = runTimerMax;
@@ -182,6 +202,8 @@ public class SceneManager : MonoBehaviour
     public void InitPlayField()
     {
         isRunning = false;
+        hitRock = false;
+        foundGoal = false;
         GameEndingText.text = "";
         currentDirection = Directions.Up;
         currentRow = 1;
@@ -193,7 +215,12 @@ public class SceneManager : MonoBehaviour
         ClearTiles();
 
         // reset first person
-        MainCamera.transform.localPosition = new Vector3(100f, MainCamera.transform.localPosition.y, 100f);
+        MainCamera.transform.localPosition = new Vector3(100f, 30f, 100f);
+        MainCamera.transform.localEulerAngles = new Vector3(0, 0, 0);
+        currentPos = new Vector3(100f, 30f, 100f);
+        desiredPos = new Vector3(100f, 30f, 100f);
+        currentRot = new Vector3(0, 0, 0);
+        desiredRot = new Vector3(0, 0, 0);
 
         showFirstPerson = false;
         ToggleDisplay();
