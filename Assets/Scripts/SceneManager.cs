@@ -53,6 +53,7 @@ public class SceneManager : MonoBehaviour
     bool isRunning = false;
     float runTimer = 0;
     float runTimerMax = 1f;
+    float runTimerEndMax = .3f;
     bool hitRock = false;
     bool foundGoal = false;
 
@@ -71,9 +72,10 @@ public class SceneManager : MonoBehaviour
             {
                 runTimer -= Time.deltaTime;
 
-                float lerpAdjustment = hitRock || foundGoal ? 3.33f : 1f;
-                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, (1f - runTimer) * lerpAdjustment);
-                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, (1f - runTimer) * lerpAdjustment);
+                float maxTime = hitRock || foundGoal ? .3f : 1f;
+                float lerpScale = hitRock || foundGoal ? 3.33f : 1f;
+                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, (maxTime - runTimer) * lerpScale);
+                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, (maxTime - runTimer) * lerpScale);
 
                 if (runTimer <= 0)
                 {
@@ -177,7 +179,7 @@ public class SceneManager : MonoBehaviour
                         currentRot = MainCamera.transform.localEulerAngles;
 
                         HighlightInstruction();
-                        runTimer = runTimerMax;
+                        runTimer = foundGoal || hitRock ? runTimerEndMax : runTimerMax;
                     }
                 }
             }
@@ -192,6 +194,7 @@ public class SceneManager : MonoBehaviour
 
     void Lose()
     {
+        Camera.main.GetComponent<CameraShake>().StartShake();
         GameEndingText.text = "YOU HIT A BOULDER!";
         isRunning = false;
     }
