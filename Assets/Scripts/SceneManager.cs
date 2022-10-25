@@ -71,8 +71,9 @@ public class SceneManager : MonoBehaviour
             {
                 runTimer -= Time.deltaTime;
 
-                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, 1f - runTimer * 1f);
-                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, 1f - runTimer * 1f);
+                float lerpAdjustment = hitRock || foundGoal ? 3.33f : 1f;
+                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, (1f - runTimer) * lerpAdjustment);
+                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, (1f - runTimer) * lerpAdjustment);
 
                 if (runTimer <= 0)
                 {
