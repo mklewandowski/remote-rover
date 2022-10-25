@@ -52,7 +52,7 @@ public class SceneManager : MonoBehaviour
     int currentCol = 0;
     bool isRunning = false;
     float runTimer = 0;
-    float runTimerMax = .5f;
+    float runTimerMax = 1f;
     bool hitRock = false;
     bool foundGoal = false;
 
@@ -71,16 +71,17 @@ public class SceneManager : MonoBehaviour
             {
                 runTimer -= Time.deltaTime;
 
-                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, 1f - runTimer * 2f);
-                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, 1f - runTimer * 2f);
+                MainCamera.transform.localPosition = Vector3.Lerp(currentPos, desiredPos, 1f - runTimer * 1f);
+                MainCamera.transform.localEulerAngles = Vector3.Lerp(currentRot, desiredRot, 1f - runTimer * 1f);
 
                 if (runTimer <= 0)
                 {
+                    currentInstruction++;
                     if (hitRock)
                     {
                         Lose();
                     }
-                    if (foundGoal)
+                    else if (foundGoal)
                     {
                         Win();
                     }
@@ -91,6 +92,7 @@ public class SceneManager : MonoBehaviour
                     else
                     {
                         string instr = instructions[currentInstruction];
+                        HighlightInstruction();
                         if (instr == "F")
                         {
                             if (currentDirection == Directions.Up)
@@ -173,7 +175,7 @@ public class SceneManager : MonoBehaviour
                         currentPos = MainCamera.transform.localPosition;
                         currentRot = MainCamera.transform.localEulerAngles;
 
-                        currentInstruction++;
+                        HighlightInstruction();
                         runTimer = runTimerMax;
                     }
                 }
@@ -336,11 +338,26 @@ public class SceneManager : MonoBehaviour
         InstructionsText.text = instr;
     }
 
+    void HighlightInstruction()
+    {
+        string instr = "";
+        for (int i = 0; i < instructions.Count; i++)
+        {
+            if (i == currentInstruction)
+                instr = instr + "<color=\"yellow\"><b>";
+            instr = instr + instructions[i];
+            if (i == currentInstruction)
+                instr = instr + "</color=\"yellow\"></b>";
+        }
+        InstructionsText.text = instr;
+    }
+
     public void StartRover()
     {
         if (isRunning)
             return;
-        currentInstruction = 0;
+        currentInstruction = -1;
+        HighlightInstruction();
         isRunning = true;
         runTimer = runTimerMax;
         showFirstPerson = true;
