@@ -46,8 +46,10 @@ public class SceneManager : MonoBehaviour
     Vector3 desiredRot;
 
     List<string> instructions = new List<string>();
+    List<string> internalInstructions = new List<string>();
 
     int currentInstruction = 0;
+    int currentInternalInstruction = 0;
     int currentRow = 0;
     int currentCol = 0;
     bool isRunning = false;
@@ -64,6 +66,7 @@ public class SceneManager : MonoBehaviour
     {
         InitPlayField();
     }
+
     void Update()
     {
         if (isRunning)
@@ -79,7 +82,7 @@ public class SceneManager : MonoBehaviour
 
                 if (runTimer <= 0)
                 {
-                    currentInstruction++;
+                    currentInternalInstruction++;
                     if (hitRock)
                     {
                         Lose();
@@ -88,13 +91,13 @@ public class SceneManager : MonoBehaviour
                     {
                         Win();
                     }
-                    else if (currentInstruction >= instructions.Count)
+                    else if (currentInternalInstruction >= internalInstructions.Count)
                     {
                         Stuck();
                     }
                     else
                     {
-                        string instr = instructions[currentInstruction];
+                        string instr = internalInstructions[currentInternalInstruction];
                         HighlightInstruction();
                         if (instr == "F")
                         {
@@ -288,6 +291,7 @@ public class SceneManager : MonoBehaviour
     {
         instructions.Clear();
         InstructionsText.text = "";
+        internalInstructions.Clear();
     }
 
     void ClearTiles()
@@ -300,6 +304,38 @@ public class SceneManager : MonoBehaviour
         {
             Destroy(firstPersonTiles[t]);
         }
+    }
+
+    public void SelectUp()
+    {
+        if (isRunning)
+            return;
+        instructions.Add("U");
+        UpdateInstruction();
+    }
+
+    public void SelectDown()
+    {
+        if (isRunning)
+            return;
+        instructions.Add("D");
+        UpdateInstruction();
+    }
+
+    public void SelectLeft()
+    {
+        if (isRunning)
+            return;
+        instructions.Add("L");
+        UpdateInstruction();
+    }
+
+    public void SelectRight()
+    {
+        if (isRunning)
+            return;
+        instructions.Add("R");
+        UpdateInstruction();
     }
 
     public void SelectRotateRight()
@@ -364,12 +400,116 @@ public class SceneManager : MonoBehaviour
     {
         if (isRunning)
             return;
+
+        CreateInternalInstructions();
         currentInstruction = -1;
+        currentInternalInstruction = -1;
         HighlightInstruction();
         isRunning = true;
         runTimer = runTimerMax;
         showFirstPerson = true;
         ToggleDisplay();
+    }
+
+    void CreateInternalInstructions()
+    {
+        for (int i = 0; i < instructions.Count; i++)
+        {
+            string prevInstr = i == 0 ? "U" : instructions[i - 1];
+
+            if (prevInstr == "U")
+            {
+                if (instructions[i] == "U")
+                {
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "R")
+                {
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "D")
+                {
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "L")
+                {
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("F");
+                }
+            }
+            else if (prevInstr == "R")
+            {
+                if (instructions[i] == "R")
+                {
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "D")
+                {
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "L")
+                {
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "U")
+                {
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("F");
+                }
+            }
+            else if (prevInstr == "D")
+            {
+                if (instructions[i] == "D")
+                {
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "L")
+                {
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "U")
+                {
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "R")
+                {
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("F");
+                }
+            }
+            else if (prevInstr == "L")
+            {
+                if (instructions[i] == "L")
+                {
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "U")
+                {
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "R")
+                {
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("R");
+                    internalInstructions.Add("F");
+                }
+                else if (instructions[i] == "D")
+                {
+                    internalInstructions.Add("L");
+                    internalInstructions.Add("F");
+                }
+            }
+        }
     }
 
     public void ToggleView()
