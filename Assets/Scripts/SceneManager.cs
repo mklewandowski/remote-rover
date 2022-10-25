@@ -177,6 +177,10 @@ public class SceneManager : MonoBehaviour
                         desiredRot = new Vector3(0, yRot, 0);
                         currentPos = MainCamera.transform.localPosition;
                         currentRot = MainCamera.transform.localEulerAngles;
+                        if (currentRot.y == 0f && desiredRot.y == 270f)
+                            desiredRot = new Vector3(desiredRot.x, -90f, desiredRot.z);
+                        else if (currentRot.y == 270f && desiredRot.y == 0)
+                            desiredRot = new Vector3(desiredRot.x, 360f, desiredRot.z);
 
                         HighlightInstruction();
                         runTimer = foundGoal || hitRock ? runTimerEndMax : runTimerMax;
