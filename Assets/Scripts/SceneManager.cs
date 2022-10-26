@@ -35,6 +35,8 @@ public class SceneManager : MonoBehaviour
     TextMeshProUGUI GameEndingText;
     [SerializeField]
     GameObject TryAgainButton;
+    [SerializeField]
+    GameObject LiveCamera;
 
     int rows = 10;
     int cols = 10;
@@ -237,6 +239,7 @@ public class SceneManager : MonoBehaviour
     {
         ProgramPanel.SetActive(!showFirstPerson);
         FirstPersonPlayfield.SetActive(showFirstPerson);
+        LiveCamera.SetActive(showFirstPerson);
     }
 
     public void InitPlayField()
@@ -246,6 +249,7 @@ public class SceneManager : MonoBehaviour
         foundGoal = false;
         GameEndingText.text = "";
         TryAgainButton.SetActive(false);
+        LiveCamera.SetActive(false);
         currentDirection = Directions.Up;
         currentRow = 1;
         currentCol = 1;
