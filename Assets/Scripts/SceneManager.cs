@@ -32,6 +32,8 @@ public class SceneManager : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI InstructionsText;
     [SerializeField]
+    GameObject GameEnding;
+    [SerializeField]
     TextMeshProUGUI GameEndingText;
     [SerializeField]
     GameObject TryAgainButton;
@@ -216,6 +218,7 @@ public class SceneManager : MonoBehaviour
     void Win()
     {
         GameEndingText.text = "YOU REACHED THE GOAL!";
+        GameEnding.SetActive(true);
         TryAgainButton.SetActive(true);
         isRunning = false;
     }
@@ -224,6 +227,7 @@ public class SceneManager : MonoBehaviour
     {
         Camera.main.GetComponent<CameraShake>().StartShake();
         GameEndingText.text = "YOU HIT A BOULDER!";
+        GameEnding.SetActive(true);
         TryAgainButton.SetActive(true);
         isRunning = false;
     }
@@ -231,6 +235,7 @@ public class SceneManager : MonoBehaviour
     void Stuck()
     {
         GameEndingText.text = "NO MORE INSTRUCTIONS!";
+        GameEnding.SetActive(true);
         TryAgainButton.SetActive(true);
         isRunning = false;
     }
@@ -249,6 +254,7 @@ public class SceneManager : MonoBehaviour
         foundGoal = false;
         GameEndingText.text = "";
         TryAgainButton.SetActive(false);
+        GameEnding.SetActive(false);
         LiveCamera.SetActive(false);
         currentDirection = Directions.Up;
         currentRow = 1;
