@@ -16,6 +16,14 @@ public class SceneManager : MonoBehaviour
     [SerializeField]
     GameObject ProgramPanel;
     [SerializeField]
+    GameObject IntroPanel;
+    [SerializeField]
+    TextMeshProUGUI IntroText;
+    [SerializeField]
+    GameObject PlayFieldPanel;
+    [SerializeField]
+    GameObject EnterProgramPanel;
+    [SerializeField]
     GameObject TileContainer;
     [SerializeField]
     GameObject TilePrefab;
@@ -25,6 +33,8 @@ public class SceneManager : MonoBehaviour
     TextMeshProUGUI InstructionsText;
     [SerializeField]
     TextMeshProUGUI GameEndingText;
+    [SerializeField]
+    GameObject TryAgainButton;
 
     int rows = 10;
     int cols = 10;
@@ -60,6 +70,10 @@ public class SceneManager : MonoBehaviour
     bool foundGoal = false;
 
     bool showFirstPerson = false;
+
+    string [] introText = {"Welcome to the Mars Rover command center. Your mission is to program the rover to reach the space capsule without hitting any boulders along the way.",
+        "Study the overhead map to choose a route for the rover. Then create a program made up of movement instructions for the the rover (up, down, left, right). When your program is ready, you can send the instructions to the rover and see how well your program works!"};
+    int currentIntroText = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -196,6 +210,7 @@ public class SceneManager : MonoBehaviour
     void Win()
     {
         GameEndingText.text = "YOU REACHED THE GOAL!";
+        TryAgainButton.SetActive(true);
         isRunning = false;
     }
 
@@ -203,12 +218,14 @@ public class SceneManager : MonoBehaviour
     {
         Camera.main.GetComponent<CameraShake>().StartShake();
         GameEndingText.text = "YOU HIT A BOULDER!";
+        TryAgainButton.SetActive(true);
         isRunning = false;
     }
 
     void Stuck()
     {
         GameEndingText.text = "NO MORE INSTRUCTIONS!";
+        TryAgainButton.SetActive(true);
         isRunning = false;
     }
 
@@ -224,6 +241,7 @@ public class SceneManager : MonoBehaviour
         hitRock = false;
         foundGoal = false;
         GameEndingText.text = "";
+        TryAgainButton.SetActive(false);
         currentDirection = Directions.Up;
         currentRow = 1;
         currentCol = 1;
@@ -516,5 +534,20 @@ public class SceneManager : MonoBehaviour
     {
         showFirstPerson = !showFirstPerson;
         ToggleDisplay();
+    }
+
+    public void NextInstruction()
+    {
+        currentIntroText++;
+        if (currentIntroText  < introText.Length)
+        {
+            IntroText.text = introText[currentIntroText];
+        }
+        else
+        {
+            IntroPanel.SetActive(false);
+            PlayFieldPanel.SetActive(true);
+            EnterProgramPanel.SetActive(true);
+        }
     }
 }
