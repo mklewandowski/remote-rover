@@ -112,6 +112,9 @@ public class SceneManager : MonoBehaviour
                     else
                     {
                         string instr = internalInstructions[currentInternalInstruction];
+                        // highlight first instruction
+                        if (currentInstruction == -1)
+                            currentInstruction = 0;
                         HighlightInstruction();
                         if (instr == "F")
                         {
@@ -123,6 +126,8 @@ public class SceneManager : MonoBehaviour
                                 currentRow--;
                             else if (currentDirection == Directions.Left)
                                 currentCol--;
+
+                            currentInstruction++;
                         }
                         else if (instr == "R")
                         {
@@ -199,7 +204,6 @@ public class SceneManager : MonoBehaviour
                         else if (currentRot.y == 270f && desiredRot.y == 0)
                             desiredRot = new Vector3(desiredRot.x, 360f, desiredRot.z);
 
-                        HighlightInstruction();
                         runTimer = foundGoal || hitRock ? runTimerEndMax : runTimerMax;
                     }
                 }
