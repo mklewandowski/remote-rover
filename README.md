@@ -1,8 +1,8 @@
 # remote-rover
-A small game where you program a rover to reach its goal while avoiding boulders.
+A small game where you program a rover investigating an alien planet. Program the rover to reach its goal while avoiding boulders.
 
 ## Gameplay
-Program your rover to reach the goal and avoid boulders. Press Forward, Rotate Right, and Rotate Left to create a list of instructions for the rover. Press Delete to remove last instruction. Press Start to send the instructions to the rover.
+Program your rover to reach the goal and avoid boulders. Press Up, Down, Left, and Right to create a list of instructions for the rover. Press Delete to remove the last instruction. Press Send Program to Rover to send the instructions to the rover and see the rover execute your instructions from a first-person 3D view.
 
 ![Remove Rover gameplay](https://github.com/mklewandowski/remote-rover/blob/main/Assets/Images/remote-robot-gameplay.gif?raw=true)
 
